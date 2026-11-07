@@ -4,7 +4,7 @@
 
 // >>> CHANGE THIS to Christine's real email address <<<
 // (it is also shown in the Contact section of index.html)
-const CONTACT_EMAIL = "YOUR-EMAIL@example.com";
+const CONTACT_EMAIL = "christine.graves21@gmail.com";
 
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();
