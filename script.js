@@ -2,9 +2,9 @@
 // Timeless Aesthetics - site behaviour
 // =========================================================
 
-// >>> CHANGE THIS to Christine's real email address <<<
-// (it is also shown in the Contact section of index.html)
+// ---------- Contact values ----------
 const CONTACT_EMAIL = "christine.graves21@gmail.com";
+const FORM_ENDPOINT = "https://formspree.io/f/xppddjjq"
 
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();
@@ -56,9 +56,7 @@ if ("IntersectionObserver" in window) {
 }
 
 // ---------- Contact form ----------
-// This site has no server, so the form opens the visitor's email app
-// with the message pre-filled. To receive messages directly instead,
-// you can later connect a form service (e.g. Formspree or Web3Forms).
+// Sends the form to Formspree, which emails the enquiry to christine.graves21@gmail.com
 const form = document.getElementById("contactForm");
 const statusEl = document.getElementById("formStatus");
 
@@ -90,24 +88,28 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
-  const data = new FormData(form);
-  const treatment = data.get("treatment") || "General query";
+  const submitBtn = form.querySelector("button[type=submit]");
+  submitBtn.disabled = true;
+  statusEl.textContent = "Sending...";
 
-  const subject = `Website enquiry: ${treatment}`;
-  const body = [
-    `Name: ${data.get("firstName")} ${data.get("lastName")}`,
-    `Email: ${data.get("email")}`,
-    `Phone: ${data.get("phone")}`,
-    `Treatment: ${treatment}`,
-    "",
-    data.get("message"),
-  ].join("\n");
-
-  window.location.href =
-    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-  statusEl.classList.add("ok");
-  statusEl.textContent = "Thank you! Your email app should now open so you can send your message.";
+  fetch(FORM_ENDPOINT, {
+    method: "POST",
+    body: new FormData(form),
+    headers: { Accept: "application/json" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed");
+      form.reset();
+      statusEl.classList.add("ok");
+      statusEl.textContent = "Thank you! Your message has been sent and I'll be in touch soon.";
+    })
+    .catch(() => {
+      statusEl.classList.add("error");
+      statusEl.textContent = "Sorry, something went wrong. Please call or email me instead.";
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+    });
 });
 
 // Clear the red highlight as soon as the user fixes a field
